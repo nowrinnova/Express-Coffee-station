@@ -1,7 +1,7 @@
 const express= require('express')
 const cors= require('cors')
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port =process.env.PORT || 5000
 const app =express()
 
@@ -25,12 +25,68 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    //make a database collection
+    const coffeeCollection=client.db('coffeeDB').collection('coffee');
+
+    app.get('/coffee',async(req,res)=>{
+      const cursor = coffeeCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.get('/coffee/:id', async(req,res)=>{
+      const id =req.params.id
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeeCollection.findOne(query);
+      res.send(result)
+    })
+
+    app.put('/coffee/:id', async(req,res)=>{
+      const id= req.params.id
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateCoffee=req.body
+      const coffee={
+        $set:{
+          name:updateCoffee.name,
+          quantity:updateCoffee.quantity, 
+          supplier:updateCoffee.supplier, 
+          test:updateCoffee.test, 
+          category:updateCoffee.category, 
+          photo:updateCoffee.photo ,
+          details:updateCoffee.details 
+        }
+      }
+      const result = await coffeeCollection.updateOne(filter,coffee,options);
+      res.send(result)
+    })
+
+    app.post('/coffee',async(req,res)=>{
+      const newCoffee= req.body
+      console.log(newCoffee)
+      const result=await coffeeCollection.insertOne(newCoffee)
+      res.send(result)
+    })
+
+    app.delete('/coffee/:id', async(req,res)=>{
+      const id =req.params.id
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeeCollection.deleteOne(query);
+      res.send(result)
+      if (result.deletedCount === 1) {
+        console.log("Successfully deleted one document.");
+      } else {
+        console.log("No documents matched the query. Deleted 0 documents.");
+      }
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
