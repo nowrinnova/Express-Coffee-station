@@ -28,17 +28,17 @@ export default function CoffeeCart({ data  ,coffees ,setCoffees}) {
           method:"DELETE"
         })
           .then((res) => res.json())
-          .then((data) => console.log(data));
-        if (data.deletedCount > 0) {
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your Coffee has been deleted.",
-            icon: "success",
-          });
-          const remaining=coffees.filter(cof=>cof._id!==_id)
-          console.log(remaining)
-          setCoffees(remaining)
-        }
+          .then((data) =>{if (data.deletedCount > 0) {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your Coffee has been deleted.",
+              icon: "success",
+            });
+            const remaining=coffees.filter(cof=>cof._id!==_id)
+            console.log(remaining)
+            setCoffees(remaining)
+          }});
+        
       }
     });
   };

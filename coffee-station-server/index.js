@@ -28,6 +28,7 @@ async function run() {
 
     //make a database collection
     const coffeeCollection=client.db('coffeeDB').collection('coffee');
+    const userCollection=client.db('coffeeDB').collection('user');
 
     app.get('/coffee',async(req,res)=>{
       const cursor = coffeeCollection.find();
@@ -79,6 +80,56 @@ async function run() {
       } else {
         console.log("No documents matched the query. Deleted 0 documents.");
       }
+    })
+
+
+    //user resources
+
+    app.get('/users',async(req,res)=>{
+      const cursor=userCollection.find()
+      const result= await cursor.toArray()
+      res.send(result)
+    })
+
+    app.get('/users/:id',async(req,res)=>{
+      const id=req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await userCollection.findOne(query)
+      res.send(result)
+    })
+    app.post('/users',async(req,res)=>{
+      const newUser=req.body
+      console.log(newUser)
+      const result=await userCollection.insertOne(newUser)
+      res.send(result)
+    })
+
+    app.put('/users/:id',async(req,res)=>{
+      const id= req.params.id
+      const filter={_id: new ObjectId(id)}
+      const options = { upsert: true };
+      const updateUsers=req.body
+      console.log(updateUsers)
+      const Users={
+        $set:{
+          name:updateUsers.name,
+          email:updateUsers.email, 
+          // supplier:updateUsers.supplier, 
+          // test:updateUsers.test, 
+          // category:updateUsers.category, 
+          // photo:updateUsers.photo ,
+          // details:updateUsers.details 
+        }
+      }
+      const result = await userCollection.updateOne(filter,Users,options);
+      res.send(result)
+    })
+
+    app.delete('/users/:id',async(req,res)=>{
+      const id = req.params.id
+      const query ={_id:new ObjectId(id)}
+      const result=await userCollection.deleteOne(query)
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection

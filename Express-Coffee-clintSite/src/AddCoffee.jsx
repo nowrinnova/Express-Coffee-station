@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2'
 export default function AddCoffee() {
   const handleAdd=(event)=>{
@@ -32,7 +33,14 @@ export default function AddCoffee() {
     })
   }
   return (
-    <div className="max-w-6xl mx-auto bg-[#F4F3F0] p-10">
+    <> <ul className='flex justify-center items-center gap-4'>
+    <li><Link to={'/'}>Home</Link></li>
+    <li><Link to={'/addCoffee'}>Add Coffee</Link></li>
+    <li><Link to={'/signIn'}>SignIn</Link></li>
+    <li><Link to={'/signOut'}>SignOut</Link></li>
+    <li></li>
+  </ul>
+  <div className="max-w-6xl mx-auto bg-[#F4F3F0] p-10">
       <form onSubmit={handleAdd}>
         <div className="md:flex gap-10 py-5">
           <div className="w-full md:w-1/2 ">
@@ -130,5 +138,7 @@ export default function AddCoffee() {
         </div>
       </form>
     </div>
+  </>
+   
   );
 }
